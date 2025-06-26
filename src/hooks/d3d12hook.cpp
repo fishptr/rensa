@@ -65,8 +65,7 @@ static HANDLE g_hSwapChainWaitableObject = nullptr;
 // static D3D12_CPU_DESCRIPTOR_HANDLE  g_mainRenderTargetDescriptor[NUM_BACK_BUFFERS] = {}; // Original
 static UINT g_ResizeWidth = 0, g_ResizeHeight = 0;
 
-bool show_demo_window = true;
-bool bShould_render = true;
+bool bMenu = false;
 
 void CreateRenderTarget() {
     // Проверяем все необходимые указатели
@@ -246,16 +245,149 @@ HRESULT __fastcall hkPresent(IDXGISwapChain3 *pSwapChain, UINT SyncInterval, UIN
         return oPresent(pSwapChain, SyncInterval, Flags);
     }
 
-    if (GetAsyncKeyState(VK_INSERT) & 1)
-        show_demo_window = !show_demo_window;
+    ImGuiStyle *style = &ImGui::GetStyle();
+
+
+    ImGui::StyleColorsClassic();
+    style->WindowPadding = ImVec2(8, 8);
+    style->WindowRounding = 5.0f;
+    style->FramePadding = ImVec2(4, 2);
+    style->FrameRounding = 0.0f;
+    style->ItemSpacing = ImVec2(8, 4);
+    style->ItemInnerSpacing = ImVec2(4, 4);
+    style->IndentSpacing = 21.0f;
+    style->ScrollbarSize = 14.0f;
+    style->ScrollbarRounding = 0.0f;
+    style->GrabMinSize = 10.0f;
+    style->GrabRounding = 0.0f;
+    style->TabRounding = 0.f;
+    style->ChildRounding = 0.0f;
+    style->WindowBorderSize = 1.f;
+    style->ChildBorderSize = 1.f;
+    style->PopupBorderSize = 0.f;
+    style->FrameBorderSize = 0.f;
+    style->TabBorderSize = 0.f;
+
+    style->Colors[ImGuiCol_Text] = ImVec4(0.000f, 0.678f, 0.929f, 1.0f);
+    style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.0f, 0.0263f, 0.0357f, 1.00f);
+    style->Colors[ImGuiCol_WindowBg] = ImVec4(0.059f, 0.051f, 0.071f, 1.00f);
+    style->Colors[ImGuiCol_ChildBg] = ImVec4(0.071f, 0.071f, 0.090f, 1.00f);
+    style->Colors[ImGuiCol_PopupBg] = ImVec4(0.0f, 0.0263f, 0.0357f, 1.00f);
+    style->Colors[ImGuiCol_Border] = ImColor(0.000f, 0.678f, 0.929f, 1.0f);
+    style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.0f, 0.0263f, 0.0357f, 0.00f);
+    style->Colors[ImGuiCol_FrameBg] = ImVec4(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_TitleBg] = ImVec4(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.0f, 0.263f, 0.357f, 1.00f);
+    style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+    style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    style->Colors[ImGuiCol_CheckMark] = ImColor(87, 119, 134, 255);
+    style->Colors[ImGuiCol_SliderGrab] = ImColor(119, 134, 169, 150);
+    style->Colors[ImGuiCol_SliderGrabActive] = ImColor(119, 134, 169, 150);
+    style->Colors[ImGuiCol_Button] = ImColor(26, 23, 31, 255);
+    style->Colors[ImGuiCol_ButtonHovered] = ImColor(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_ButtonActive] = ImColor(0.102f, 0.090f, 0.122f, 1.000f);
+    style->Colors[ImGuiCol_Header] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_HeaderHovered] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_HeaderActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_Separator] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_SeparatorActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_ResizeGrip] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    style->Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    style->Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    style->Colors[ImGuiCol_PlotLines] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+    style->Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
+
+    style->WindowTitleAlign.x = 0.50f;
+    style->FrameRounding = 0.0f;
 
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::GetIO().MouseDrawCursor = show_demo_window;
-    if (show_demo_window)
-        ImGui::ShowDemoWindow();
+    static int MenuTab = 0;
+    float
+            TextSpaceLine = 90.f,
+            SpaceLineOne = 120.f,
+            SpaceLineTwo = 280.f,
+            SpaceLineThr = 420.f;
+    static const char *HitboxList[]{"Head", "Neck", "Chest", "Pelvis"};
+    static int SelectedHitbox = 0;
+
+    static const char *MouseKeys[]{"RMouse", "LMouse", "Control", "Shift", "Alt"};
+    static int KeySelected = 0;
+
+    if (GetAsyncKeyState(VK_INSERT) & 1) bMenu = !bMenu;
+    if (bMenu) {
+        ImGui::GetForegroundDrawList()->AddCircleFilled(ImGui::GetIO().MousePos, float(4), ImColor(255, 0, 0), 50);
+
+        ImGui::SetNextWindowSize({620.f, 350.f});
+
+        ImGui::Begin("rensa", 0,
+                     ImGuiWindowFlags_::ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoScrollbar);
+        ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+        ImGui::SetCursorPos({36.f, 31.f});
+        ImGui::Text("by fishptr");
+        ImGui::SetCursorPos({22.f, 56.f});
+        if (ImGui::Button("Aimbot", {89.f, 32.f})) {
+            MenuTab = 0;
+        }
+        ImGui::SetCursorPos({22.f, 93.f});
+        if (ImGui::Button("Visuals", {89.f, 32.f})) {
+            MenuTab = 1;
+        }
+        ImGui::SetCursorPos({22.f, 130.f});
+        if (ImGui::Button("MISC", {89.f, 32.f})) {
+            MenuTab = 2;
+        }
+        /*
+        ImGui::SetCursorPos({22.f, 204.f});
+        if (ImGui::Button("Discord", {89.f, 32.f})) {
+            system("start https://discord.gg/8jTAstg4GK");
+        }
+        ImGui::SetCursorPos({22.f, 291.f});
+        if (ImGui::Button("unload", {65.f, 20.f})) {
+            exit(0);
+        }
+        */
+        style->ItemSpacing = ImVec2(8, 8);
+
+        if (MenuTab == 0) {
+            ImGui::SetCursorPos({137.f, 39.f});
+            ImGui::BeginChild("##Aimbot", {450.f, 279.f}, true);
+            ImGui::SetCursorPos({19.f, 14.f});
+            ImGui::Text("Aim:");
+            //ImGui::Checkbox("Aimbot", &bAimbot);
+            //ImGui::SliderFloat("Smooth", &Smooth, 2, 15);
+            //ImGui::SliderInt("Fov Size", &FovSize, 50, 600);
+        }
+        if (MenuTab == 1) {
+            ImGui::SetCursorPos({137.f, 39.f});
+            ImGui::BeginChild("##Visuals", {450.f, 279.f}, true);
+            ImGui::SetCursorPos({19.f, 14.f});
+            ImGui::Text("Enemy:");
+            //ImGui::Checkbox("Corner Box", &bCornerBox);
+        }
+        if (MenuTab == 2) {
+            ImGui::SetCursorPos({137.f, 39.f});
+            ImGui::BeginChild("##Misc", {450.f, 279.f}, true);
+            ImGui::SetCursorPos({19.f, 14.f});
+            ImGui::Text("Gay:");
+        }
+        ImGui::EndChild();
+        ImGui::End();
+    }
 
     FrameContext &frameCtx = g_frameContext[pSwapChain->GetCurrentBackBufferIndex()];
     frameCtx.CommandAllocator->Reset();
